@@ -29,7 +29,8 @@
     "lint-format": "prettier  --loglevel warn --write \"./**/*.{ts,tsx,css,md,json}\"",
     "lint": "yarn lint-format && yarn lint-fix",
     "test": "yarn run tsc && yarn run lint",
-    "prepublishOnly": "yarn run build"
+    "prepublishOnly": "yarn run build",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "@chengsokdara/react-hooks-async": "^0.0.2",
