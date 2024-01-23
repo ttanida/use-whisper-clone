@@ -475,10 +475,17 @@ export const useWhisper: UseWhisperHook = (config) => {
           const file = new File([blob], 'speech.mp3', {
             type: 'audio/mpeg',
           })
-          const text = await onWhispered(file)
-          console.log('onInterim', { text })
+
+          let text = ''
+
+          if (typeof onTranscribeCallback === 'function') {
+            const transcriptResult = await onTranscribeCallback(file)
+            text = transcriptResult.text || '' // Extracting the 'text' field and providing a default empty string
+          } else {
+            text = await onWhispered(file)
+          }
           if (text) {
-            setTranscript((prev) => ({ ...prev, text }))
+            setTranscript((prev) => ({ ...prev, text: text as string }))
           }
         }
       }
