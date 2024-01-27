@@ -154,11 +154,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     await onStopRecording()
   }
 
-  const transcribe = async () => {
-    const result = await onTranscribing();
-    return result || ''; // Return an empty string if result is undefined
-  }
-
   /**
    * start speech recording event
    * - first ask user for media stream
@@ -379,91 +374,83 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - set transcript object with audio blob and transcription result from Whisper
    * - set transcribing state to false
    */
+
   const onTranscribing = async () => {
     console.log('transcribing speech')
     try {
       if (encoder.current && recorder.current) {
-        setTranscribing(true)
-        let blob = await recorder.current.getBlob()
-        let transcribed_message = ''
-
-        if (removeSilence) {
-          const { createFFmpeg } = await import('@ffmpeg/ffmpeg')
-          const ffmpeg = createFFmpeg({
-            mainName: 'main',
-            corePath: ffmpegCoreUrl,
-            log: true,
-          })
-          if (!ffmpeg.isLoaded()) {
-            await ffmpeg.load()
+        const recordState = await recorder.current.getState()
+        if (recordState === 'stopped') {
+          setTranscribing(true)
+          let blob = await recorder.current.getBlob()
+          if (removeSilence) {
+            const { createFFmpeg } = await import('@ffmpeg/ffmpeg')
+            const ffmpeg = createFFmpeg({
+              mainName: 'main',
+              corePath: ffmpegCoreUrl,
+              log: true,
+            })
+            if (!ffmpeg.isLoaded()) {
+              await ffmpeg.load()
+            }
+            const buffer = await blob.arrayBuffer()
+            console.log({ in: buffer.byteLength })
+            ffmpeg.FS('writeFile', 'in.wav', new Uint8Array(buffer))
+            await ffmpeg.run(
+              '-i', // Input
+              'in.wav',
+              '-acodec', // Audio codec
+              'libmp3lame',
+              '-b:a', // Audio bitrate
+              '96k',
+              '-ar', // Audio sample rate
+              '44100',
+              '-af', // Audio filter = remove silence from start to end with 2 seconds in between
+              silenceRemoveCommand,
+              'out.mp3' // Output
+            )
+            const out = ffmpeg.FS('readFile', 'out.mp3')
+            console.log({ out: out.buffer.byteLength })
+            // 225 seems to be empty mp3 file
+            if (out.length <= 225) {
+              ffmpeg.exit()
+              setTranscript({
+                blob,
+              })
+              setTranscribing(false)
+              return
+            }
+            blob = new Blob([out.buffer], { type: 'audio/mpeg' })
+            ffmpeg.exit()
+          } else {
+            const buffer = await blob.arrayBuffer()
+            console.log({ wav: buffer.byteLength })
+            const mp3 = encoder.current.encodeBuffer(new Int16Array(buffer))
+            blob = new Blob([mp3], { type: 'audio/mpeg' })
+            console.log({ blob, mp3: mp3.byteLength })
           }
-          const buffer = await blob.arrayBuffer()
-          console.log({ in: buffer.byteLength })
-          ffmpeg.FS('writeFile', 'in.wav', new Uint8Array(buffer))
-          await ffmpeg.run(
-            '-i', // Input
-            'in.wav',
-            '-acodec', // Audio codec
-            'libmp3lame',
-            '-b:a', // Audio bitrate
-            '96k',
-            '-ar', // Audio sample rate
-            '44100',
-            '-af', // Audio filter = remove silence from start to end with 2 seconds in between
-            silenceRemoveCommand,
-            'out.mp3' // Output
-          )
-
-          return "Hi, where are you?";
-
-          // const out = ffmpeg.FS('readFile', 'out.mp3')
-          // console.log({ out: out.buffer.byteLength })
-
-          // // 225 seems to be empty mp3 file
-          // if (out.length <= 225) {
-          //   ffmpeg.exit()
-          //   setTranscript({
-          //     blob,
-          //   })
-          //   setTranscribing(false)
-          //   return "There was an error 1"
-          // }
-          // blob = new Blob([out.buffer], { type: 'audio/mpeg' })
-          // ffmpeg.exit()
-        } else {
-          const buffer = await blob.arrayBuffer()
-          console.log({ wav: buffer.byteLength })
-          const mp3 = encoder.current.encodeBuffer(new Int16Array(buffer))
-          blob = new Blob([mp3], { type: 'audio/mpeg' })
-          console.log({ blob, mp3: mp3.byteLength })
+          if (typeof onTranscribeCallback === 'function') {
+            const transcribed = await onTranscribeCallback(blob)
+            console.log('onTranscribe', transcribed)
+            setTranscript(transcribed)
+          } else {
+            const file = new File([blob], 'speech.mp3', { type: 'audio/mpeg' })
+            const text = await onWhispered(file)
+            console.log('onTranscribing', { text })
+            setTranscript({
+              blob,
+              text,
+            })
+          }
+          setTranscribing(false)
         }
-
-        // if (typeof onTranscribeCallback === 'function') {
-        //   const transcribed = await onTranscribeCallback(blob)
-        //   console.log('onTranscribe', transcribed)
-        //   setTranscript(transcribed)
-        //   transcribed_message = transcribed.text || ''
-        //   transcribed_message = "There was an error 4"
-        // }
-        // setTranscribing(false)
-
-        // return transcribed_message
       }
-      return "There was an error 2"
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      // return the text of the error
-      if (err instanceof Error) {
-        // return the text of the error
-        return err.message;
-      } else {
-        // Handle the case where err is not an Error object
-        // For example, return a generic error message or handle it in another way
-        return "An unknown error occurred";
-      }
     }
   }
+
 
   /**
    * Get audio data in chunk based on timeSlice
@@ -564,6 +551,5 @@ export const useWhisper: UseWhisperHook = (config) => {
     setTranscript, // added to the return object
     defaultTranscript, // added to the return object
     clearChunks, // added to the return object
-    transcribe, // added to the return object
   }
 }
