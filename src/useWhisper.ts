@@ -144,7 +144,7 @@ export const useWhisper: UseWhisperHook = (config) => {
    * pause speech recording also stop media stream
    */
   const pauseRecording = async () => {
-    return await onTranscribing()
+    await onPauseRecording()
   }
 
   /**
@@ -155,7 +155,8 @@ export const useWhisper: UseWhisperHook = (config) => {
   }
 
   const transcribe = async () => {
-    return await onTranscribing()
+    const result = await onTranscribing();
+    return result || ''; // Return an empty string if result is undefined
   }
 
   /**
@@ -384,6 +385,8 @@ export const useWhisper: UseWhisperHook = (config) => {
       if (encoder.current && recorder.current) {
         setTranscribing(true)
         let blob = await recorder.current.getBlob()
+        let transcribed_message = ''
+
         if (removeSilence) {
           const { createFFmpeg } = await import('@ffmpeg/ffmpeg')
           const ffmpeg = createFFmpeg({
@@ -412,6 +415,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           )
           const out = ffmpeg.FS('readFile', 'out.mp3')
           console.log({ out: out.buffer.byteLength })
+
           // 225 seems to be empty mp3 file
           if (out.length <= 225) {
             ffmpeg.exit()
@@ -419,7 +423,7 @@ export const useWhisper: UseWhisperHook = (config) => {
               blob,
             })
             setTranscribing(false)
-            return
+            return transcribed_message
           }
           blob = new Blob([out.buffer], { type: 'audio/mpeg' })
           ffmpeg.exit()
@@ -430,8 +434,6 @@ export const useWhisper: UseWhisperHook = (config) => {
           blob = new Blob([mp3], { type: 'audio/mpeg' })
           console.log({ blob, mp3: mp3.byteLength })
         }
-
-        let transcribed_message = ''
 
         if (typeof onTranscribeCallback === 'function') {
           const transcribed = await onTranscribeCallback(blob)
@@ -548,6 +550,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     setTranscript, // added to the return object
     defaultTranscript, // added to the return object
     clearChunks, // added to the return object
-    // transcribe, // added to the return object
+    transcribe, // added to the return object
   }
 }
