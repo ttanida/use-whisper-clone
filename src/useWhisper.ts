@@ -440,6 +440,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           console.log('onTranscribe', transcribed)
           setTranscript(transcribed)
           transcribed_message = transcribed.text || ''
+          transcribed_message = "There was an error 4"
         }
         setTranscribing(false)
 
