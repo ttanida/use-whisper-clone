@@ -542,5 +542,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     pauseRecording,
     startRecording,
     stopRecording,
+    setTranscript, // added to the return object
+    defaultTranscript, // added to the return object
   }
 }
