@@ -144,7 +144,7 @@ export const useWhisper: UseWhisperHook = (config) => {
    * pause speech recording also stop media stream
    */
   const pauseRecording = async () => {
-    await onPauseRecording()
+    return await onTranscribing()
   }
 
   /**
@@ -548,6 +548,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     setTranscript, // added to the return object
     defaultTranscript, // added to the return object
     clearChunks, // added to the return object
-    transcribe, // added to the return object
+    // transcribe, // added to the return object
   }
 }
