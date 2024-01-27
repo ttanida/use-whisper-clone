@@ -155,7 +155,7 @@ export const useWhisper: UseWhisperHook = (config) => {
   }
 
   const transcribe = async () => {
-    await onTranscribing()
+    return await onTranscribing()
   }
 
   /**
@@ -431,17 +431,17 @@ export const useWhisper: UseWhisperHook = (config) => {
           console.log({ blob, mp3: mp3.byteLength })
         }
 
-        let transcripted_message = ''
+        let transcribed_message = ''
 
         if (typeof onTranscribeCallback === 'function') {
           const transcribed = await onTranscribeCallback(blob)
           console.log('onTranscribe', transcribed)
           setTranscript(transcribed)
-          transcripted_message = transcribed.text || ''
+          transcribed_message = transcribed.text || ''
         }
         setTranscribing(false)
 
-        return transcripted_message
+        return transcribed_message
       }
     } catch (err) {
       console.info(err)
