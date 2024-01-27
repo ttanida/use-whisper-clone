@@ -423,7 +423,7 @@ export const useWhisper: UseWhisperHook = (config) => {
               blob,
             })
             setTranscribing(false)
-            return transcribed_message
+            return "There was an error 1"
           }
           blob = new Blob([out.buffer], { type: 'audio/mpeg' })
           ffmpeg.exit()
@@ -445,9 +445,11 @@ export const useWhisper: UseWhisperHook = (config) => {
 
         return transcribed_message
       }
+      return "There was an error 2"
     } catch (err) {
       console.info(err)
       setTranscribing(false)
+      return "There was an error 3"
     }
   }
 
