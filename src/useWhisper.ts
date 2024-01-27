@@ -450,7 +450,15 @@ export const useWhisper: UseWhisperHook = (config) => {
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      return "There was an error 3"
+      // return the text of the error
+      if (err instanceof Error) {
+        // return the text of the error
+        return err.message;
+      } else {
+        // Handle the case where err is not an Error object
+        // For example, return a generic error message or handle it in another way
+        return "An unknown error occurred";
+      }
     }
   }
 
