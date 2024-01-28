@@ -152,7 +152,7 @@ export const useWhisper: UseWhisperHook = (config) => {
    */
   const stopRecording = async (): Promise<string> => {
     return new Promise((resolve) => {
-      resolve("Hello there!");
+      resolve("Hello, how are you?");
     });
     // const result = await onStopRecording();
     // return result ?? "Default message or error message"; // Provide a default return value
