@@ -1,4 +1,4 @@
-# useWhisper - Clone
+# useWhisper - Clone (this is a test)
 
 React Hook for OpenAI Whisper API with speech recorder, real-time transcription and silence removal built-in
 
