@@ -528,6 +528,11 @@ export const useWhisper: UseWhisperHook = (config) => {
     [apiKey, mode, whisperConfig]
   )
 
+  const getHelloWorld = () => {
+    return "Hello World";
+  }
+  
+
   return {
     recording,
     speaking,
@@ -536,5 +541,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     pauseRecording,
     startRecording,
     stopRecording,
+    getHelloWorld
   }
 }

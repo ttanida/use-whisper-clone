@@ -30,6 +30,7 @@ export type UseWhisperReturn = {
   pauseRecording: () => Promise<void>
   startRecording: () => Promise<void>
   stopRecording: () => Promise<string>
+  getHelloWorld: () => string // Added line for getHelloWorld
 }
 
 export type UseWhisperHook = (config?: UseWhisperConfig) => UseWhisperReturn
