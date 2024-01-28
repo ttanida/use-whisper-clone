@@ -377,7 +377,7 @@ export const useWhisper: UseWhisperHook = (config) => {
   const onTranscribing = async (): Promise<string | null> => {
     console.log('transcribing speech')
     try {
-      let transcribed_message = "";
+      let transcribed_message = "Some default text";
 
       if (encoder.current && recorder.current) {
         const recordState = await recorder.current.getState()
@@ -434,7 +434,7 @@ export const useWhisper: UseWhisperHook = (config) => {
             const transcribed = await onTranscribeCallback(blob)
             console.log('onTranscribe', transcribed)
             setTranscript(transcribed)
-            transcribed_message = transcribed.text ?? "";
+            return transcribed.text ?? "There has been an error here!"; // Return null in case of error
           }
           setTranscribing(false)
         }
@@ -444,7 +444,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      return null; // Return null in case of error
+      return "We are in the actch blcok"; // Return null in case of error
     }
   }
 
