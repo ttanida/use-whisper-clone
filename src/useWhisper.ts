@@ -479,7 +479,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           const text = await onWhispered(file) // change this part to use a locally hosted whisper model (sst_server) for real-time transcription
           console.log('onInterim', { text })
           if (text) {
-            setTranscript((prev) => ({ ...prev, text }))
+            setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
           }
         }
       }
