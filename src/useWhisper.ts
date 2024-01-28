@@ -303,6 +303,7 @@ export const useWhisper: UseWhisperHook = (config) => {
    */
   const onStopRecording = async () => {
     try {
+      setTranscript((prev) => ({ ...prev, text: "Hi can you hear me!" as string }))
       if (recorder.current) {
         const recordState = await recorder.current.getState()
         if (recordState === 'recording' || recordState === 'paused') {
