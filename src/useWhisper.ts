@@ -303,7 +303,6 @@ export const useWhisper: UseWhisperHook = (config) => {
    */
   const onStopRecording = async () => {
     try {
-      setTranscript((prev) => ({ ...prev, text: "Hi can you hear me!" as string }))
       if (recorder.current) {
         const recordState = await recorder.current.getState()
         if (recordState === 'recording' || recordState === 'paused') {
@@ -382,7 +381,6 @@ export const useWhisper: UseWhisperHook = (config) => {
       if (encoder.current && recorder.current) {
         const recordState = await recorder.current.getState()
         if (recordState === 'stopped') {
-          setTranscript((prev) => ({ ...prev, text: "Hi this is a test" as string }))
           setTranscribing(true)
           let blob = await recorder.current.getBlob()
           if (removeSilence) {
@@ -479,17 +477,10 @@ export const useWhisper: UseWhisperHook = (config) => {
           const file = new File([blob], 'speech.mp3', {
             type: 'audio/mpeg',
           })
-
-          let text = ''
-
-          if (typeof onTranscribeCallback === 'function') {
-            const transcriptResult = await onTranscribeCallback(file)
-            text = transcriptResult.text || '' // Extracting the 'text' field and providing a default empty string
-          } else {
-            text = await onWhispered(file)
-          }
+          const text = await onWhispered(file) // change this part to use a locally hosted whisper model (sst_server) for real-time transcription
+          console.log('onInterim', { text })
           if (text) {
-            setTranscript((prev) => ({ ...prev, text: text as string }))
+            setTranscript((prev) => ({ ...prev, text }))
           }
         }
       }
@@ -538,10 +529,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     [apiKey, mode, whisperConfig]
   )
 
-  // const clearChunks = () => {
-  //   chunks.current = []
-  // }
-
   return {
     recording,
     speaking,
@@ -550,6 +537,5 @@ export const useWhisper: UseWhisperHook = (config) => {
     pauseRecording,
     startRecording,
     stopRecording,
-    setTranscript, // added to the return object
   }
 }
