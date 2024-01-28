@@ -150,16 +150,10 @@ export const useWhisper: UseWhisperHook = (config) => {
   /**
    * stop speech recording and start the transcription
    */
-  const stopRecording = async (): Promise<string> => {
-    // return new Promise((resolve) => {
-    //   resolve("Hello, how are you?");
-    // });
-    const result = await onStopRecording();
-    return result ?? new Promise((resolve) => {
-        resolve("Unresolved Promise?");
-      });
-
+  const stopRecording = async (): Promise<string | null> => {
+    return await onStopRecording();
   }
+
 
   /**
    * start speech recording event
@@ -421,9 +415,11 @@ export const useWhisper: UseWhisperHook = (config) => {
             // 225 seems to be empty mp3 file
             if (out.length <= 225) {
               ffmpeg.exit()
-              setTranscript((prev) => ({ ...prev, text: "Hello there!!!!!"}))
+              setTranscript({
+                blob,
+              })
               setTranscribing(false)
-              return "There was an error..."; // Return null in case of error
+              return null;
             }
             blob = new Blob([out.buffer], { type: 'audio/mpeg' })
             ffmpeg.exit()
@@ -438,7 +434,8 @@ export const useWhisper: UseWhisperHook = (config) => {
             const transcribed = await onTranscribeCallback(blob)
             console.log('onTranscribe', transcribed)
             setTranscript(transcribed)
-            return transcribed.text ?? "There has been an error here!"; // Return null in case of error
+            setTranscribing(false)
+            return transcribed.text ?? null;
           }
           setTranscribing(false)
         }
@@ -448,7 +445,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      return "We are in the catch blcok"; // Return null in case of error
+      return null;
     }
   }
 
@@ -481,7 +478,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           const text = await onWhispered(file) // change this part to use a locally hosted whisper model (sst_server) for real-time transcription
           console.log('onInterim', { text })
           if (text) {
-            setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
+            setTranscript((prev) => ({ ...prev, text }))
           }
         }
       }
@@ -529,12 +526,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     },
     [apiKey, mode, whisperConfig]
   )
-
-  const getHelloWorld = () => {
-    return "Hello...123";
-  }
   
-
   return {
     recording,
     speaking,
@@ -542,7 +534,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     transcript,
     pauseRecording,
     startRecording,
-    stopRecording,
-    getHelloWorld
+    stopRecording
   }
 }
