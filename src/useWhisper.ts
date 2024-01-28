@@ -433,7 +433,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           if (typeof onTranscribeCallback === 'function') {
             const transcribed = await onTranscribeCallback(blob)
             console.log('onTranscribe', transcribed)
-            setTranscript(transcribed)
+            setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
             return transcribed.text ?? "There has been an error here!"; // Return null in case of error
           }
           setTranscribing(false)
