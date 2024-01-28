@@ -150,8 +150,9 @@ export const useWhisper: UseWhisperHook = (config) => {
   /**
    * stop speech recording and start the transcription
    */
-  const stopRecording = async () => {
-    await onStopRecording()
+  const stopRecording = async (): Promise<string> => {
+    const result = await onStopRecording();
+    return result ?? "Default message or error message"; // Provide a default return value
   }
 
   /**
@@ -301,7 +302,7 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - start Whisper transcription event
    * - destroy recordrtc instance and clear it from ref
    */
-  const onStopRecording = async () => {
+  const onStopRecording = async (): Promise<string | null> => {
     try {
       if (recorder.current) {
         const recordState = await recorder.current.getState()
@@ -311,14 +312,8 @@ export const useWhisper: UseWhisperHook = (config) => {
         onStopStreaming()
         onStopTimeout('stop')
         setRecording(false)
-        if (autoTranscribe) {
-          await onTranscribing()
-        } else {
-          const blob = await recorder.current.getBlob()
-          setTranscript({
-            blob,
-          })
-        }
+
+        const transcribed_message = await onTranscribing()
         await recorder.current.destroy()
         chunks.current = []
         if (encoder.current) {
@@ -326,9 +321,13 @@ export const useWhisper: UseWhisperHook = (config) => {
           encoder.current = undefined
         }
         recorder.current = undefined
+
+        return transcribed_message
       }
+      return null; // Return null if recorder.current is not truthy
     } catch (err) {
       console.error(err)
+      return null; // Return null in case of error
     }
   }
 
@@ -375,9 +374,11 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - set transcribing state to false
    */
 
-  const onTranscribing = async () => {
+  const onTranscribing = async (): Promise<string | null> => {
     console.log('transcribing speech')
     try {
+      let transcribed_message = "";
+
       if (encoder.current && recorder.current) {
         const recordState = await recorder.current.getState()
         if (recordState === 'stopped') {
@@ -418,7 +419,7 @@ export const useWhisper: UseWhisperHook = (config) => {
                 blob,
               })
               setTranscribing(false)
-              return
+              return null; // Return null in case of error
             }
             blob = new Blob([out.buffer], { type: 'audio/mpeg' })
             ffmpeg.exit()
@@ -433,21 +434,17 @@ export const useWhisper: UseWhisperHook = (config) => {
             const transcribed = await onTranscribeCallback(blob)
             console.log('onTranscribe', transcribed)
             setTranscript(transcribed)
-          } else {
-            const file = new File([blob], 'speech.mp3', { type: 'audio/mpeg' })
-            const text = await onWhispered(file)
-            console.log('onTranscribing', { text })
-            setTranscript({
-              blob,
-              text,
-            })
+            transcribed_message = transcribed.text ?? "";
           }
           setTranscribing(false)
         }
       }
+
+      return transcribed_message;
     } catch (err) {
       console.info(err)
       setTranscribing(false)
+      return null; // Return null in case of error
     }
   }
 
