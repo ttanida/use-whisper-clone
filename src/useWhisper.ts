@@ -415,9 +415,7 @@ export const useWhisper: UseWhisperHook = (config) => {
             // 225 seems to be empty mp3 file
             if (out.length <= 225) {
               ffmpeg.exit()
-              setTranscript({
-                blob,
-              })
+              setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
               setTranscribing(false)
               return "There was an error..."; // Return null in case of error
             }
