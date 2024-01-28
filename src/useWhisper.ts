@@ -381,6 +381,7 @@ export const useWhisper: UseWhisperHook = (config) => {
       if (encoder.current && recorder.current) {
         const recordState = await recorder.current.getState()
         if (recordState === 'stopped') {
+          setTranscript((prev) => ({ ...prev, text: "Hi this is a test" as string }))
           setTranscribing(true)
           let blob = await recorder.current.getBlob()
           if (removeSilence) {

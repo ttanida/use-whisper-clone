@@ -1,2 +1,2 @@
-export { a as useWhisper } from './chunk-M6DAGGP2.js';
+export { a as useWhisper } from './chunk-WEJA2PLO.js';
 import './chunk-VO7VPLVP.js';
