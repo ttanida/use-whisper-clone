@@ -419,7 +419,7 @@ export const useWhisper: UseWhisperHook = (config) => {
                 blob,
               })
               setTranscribing(false)
-              return null; // Return null in case of error
+              return "There was an error..."; // Return null in case of error
             }
             blob = new Blob([out.buffer], { type: 'audio/mpeg' })
             ffmpeg.exit()
@@ -444,7 +444,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      return "We are in the actch blcok"; // Return null in case of error
+      return "We are in the catch blcok"; // Return null in case of error
     }
   }
 
