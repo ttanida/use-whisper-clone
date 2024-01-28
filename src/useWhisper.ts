@@ -151,11 +151,13 @@ export const useWhisper: UseWhisperHook = (config) => {
    * stop speech recording and start the transcription
    */
   const stopRecording = async (): Promise<string> => {
-    return new Promise((resolve) => {
-      resolve("Hello, how are you?");
-    });
-    // const result = await onStopRecording();
-    // return result ?? "Default message or error message"; // Provide a default return value
+    // return new Promise((resolve) => {
+    //   resolve("Hello, how are you?");
+    // });
+    const result = await onStopRecording();
+    return result ?? new Promise((resolve) => {
+        resolve("Unresolved Promise?");
+      });
 
   }
 
@@ -419,7 +421,7 @@ export const useWhisper: UseWhisperHook = (config) => {
             // 225 seems to be empty mp3 file
             if (out.length <= 225) {
               ffmpeg.exit()
-              setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
+              setTranscript((prev) => ({ ...prev, text: "Hello there!!!!!"}))
               setTranscribing(false)
               return "There was an error..."; // Return null in case of error
             }
@@ -435,7 +437,7 @@ export const useWhisper: UseWhisperHook = (config) => {
           if (typeof onTranscribeCallback === 'function') {
             const transcribed = await onTranscribeCallback(blob)
             console.log('onTranscribe', transcribed)
-            setTranscript((prev) => ({ ...prev, text: "Hello there!"}))
+            setTranscript(transcribed)
             return transcribed.text ?? "There has been an error here!"; // Return null in case of error
           }
           setTranscribing(false)
@@ -529,7 +531,7 @@ export const useWhisper: UseWhisperHook = (config) => {
   )
 
   const getHelloWorld = () => {
-    return "Hello...";
+    return "Hello...123";
   }
   
 
