@@ -536,9 +536,9 @@ export const useWhisper: UseWhisperHook = (config) => {
     [apiKey, mode, whisperConfig]
   )
 
-  const clearChunks = () => {
-    chunks.current = []
-  }
+  // const clearChunks = () => {
+  //   chunks.current = []
+  // }
 
   return {
     recording,
@@ -549,7 +549,5 @@ export const useWhisper: UseWhisperHook = (config) => {
     startRecording,
     stopRecording,
     setTranscript, // added to the return object
-    defaultTranscript, // added to the return object
-    clearChunks, // added to the return object
   }
 }
