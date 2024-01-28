@@ -151,10 +151,9 @@ export const useWhisper: UseWhisperHook = (config) => {
    * stop speech recording and start the transcription
    */
   const stopRecording = async (): Promise<string> => {
-    // return a promise with a default string value of "Hello there!"
-    // don't use onStopRecording() here because we want to return a string value
-    // instead of a promise
-    return "Hello there!"
+    return new Promise((resolve) => {
+      resolve("Hello there!");
+    });
     // const result = await onStopRecording();
     // return result ?? "Default message or error message"; // Provide a default return value
 
