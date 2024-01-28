@@ -529,7 +529,7 @@ export const useWhisper: UseWhisperHook = (config) => {
   )
 
   const getHelloWorld = () => {
-    return "Hello 123";
+    return "Hello...";
   }
   
 
