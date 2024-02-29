@@ -151,9 +151,8 @@ export const useWhisper: UseWhisperHook = (config) => {
    * stop speech recording and start the transcription
    */
   const stopRecording = async (): Promise<string | null> => {
-    return await onStopRecording();
+    return await onStopRecording()
   }
-
 
   /**
    * start speech recording event
@@ -324,10 +323,10 @@ export const useWhisper: UseWhisperHook = (config) => {
 
         return transcribed_message
       }
-      return null; // Return null if recorder.current is not truthy
+      return null // Return null if recorder.current is not truthy
     } catch (err) {
       console.error(err)
-      return null; // Return null in case of error
+      return null // Return null in case of error
     }
   }
 
@@ -377,7 +376,7 @@ export const useWhisper: UseWhisperHook = (config) => {
   const onTranscribing = async (): Promise<string | null> => {
     console.log('transcribing speech')
     try {
-      let transcribed_message = "Some default text";
+      let transcribed_message = 'Some default text'
 
       if (encoder.current && recorder.current) {
         const recordState = await recorder.current.getState()
@@ -419,7 +418,7 @@ export const useWhisper: UseWhisperHook = (config) => {
                 blob,
               })
               setTranscribing(false)
-              return null;
+              return null
             }
             blob = new Blob([out.buffer], { type: 'audio/mpeg' })
             ffmpeg.exit()
@@ -435,20 +434,19 @@ export const useWhisper: UseWhisperHook = (config) => {
             console.log('onTranscribe', transcribed)
             setTranscript(transcribed)
             setTranscribing(false)
-            return transcribed.text ?? null;
+            return transcribed.text ?? null
           }
           setTranscribing(false)
         }
       }
 
-      return transcribed_message;
+      return transcribed_message
     } catch (err) {
       console.info(err)
       setTranscribing(false)
-      return null;
+      return null
     }
   }
-
 
   /**
    * Get audio data in chunk based on timeSlice
@@ -502,7 +500,9 @@ export const useWhisper: UseWhisperHook = (config) => {
       body.append('file', file)
       body.append('model', 'whisper-1')
       if (mode === 'transcriptions') {
-        body.append('language', whisperConfig?.language ?? 'en')
+        if (whisperConfig?.language) {
+          body.append('language', whisperConfig.language)
+        }
       }
       if (whisperConfig?.prompt) {
         body.append('prompt', whisperConfig.prompt)
@@ -526,7 +526,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     },
     [apiKey, mode, whisperConfig]
   )
-  
+
   return {
     recording,
     speaking,
@@ -534,6 +534,6 @@ export const useWhisper: UseWhisperHook = (config) => {
     transcript,
     pauseRecording,
     startRecording,
-    stopRecording
+    stopRecording,
   }
 }
