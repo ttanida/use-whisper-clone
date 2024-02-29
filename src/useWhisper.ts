@@ -497,6 +497,7 @@ export const useWhisper: UseWhisperHook = (config) => {
     async (file: File) => {
       // Whisper only accept multipart/form-data currently
       const body = new FormData()
+      throw new Error('Whisper API is not available')
       body.append('file', file)
       body.append('model', 'whisper-1')
       if (mode === 'transcriptions') {
