@@ -205,7 +205,6 @@ export const useWhisper: UseWhisperHook = (config) => {
         setRecording(true)
       }
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -233,7 +232,6 @@ export const useWhisper: UseWhisperHook = (config) => {
         listener.current.on('stopped_speaking', onStopSpeaking)
       }
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -252,7 +250,6 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - clear stop timeout
    */
   const onStartSpeaking = () => {
-    console.log('start speaking')
     setSpeaking(true)
     onStopTimeout('stop')
   }
@@ -263,7 +260,6 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - start stop timeout back
    */
   const onStopSpeaking = () => {
-    console.log('stop speaking')
     setSpeaking(false)
     if (nonStop) {
       onStartTimeout('stop')
@@ -287,7 +283,6 @@ export const useWhisper: UseWhisperHook = (config) => {
         setRecording(false)
       }
     } catch (err) {
-      console.error(err)
     }
   }
 
@@ -325,7 +320,6 @@ export const useWhisper: UseWhisperHook = (config) => {
       }
       return null // Return null if recorder.current is not truthy
     } catch (err) {
-      console.error(err)
       return null // Return null in case of error
     }
   }
@@ -374,7 +368,6 @@ export const useWhisper: UseWhisperHook = (config) => {
    */
 
   const onTranscribing = async (): Promise<string | null> => {
-    console.log('transcribing speech')
     try {
       let transcribed_message = 'Some default text'
 
@@ -394,7 +387,6 @@ export const useWhisper: UseWhisperHook = (config) => {
               await ffmpeg.load()
             }
             const buffer = await blob.arrayBuffer()
-            console.log({ in: buffer.byteLength })
             ffmpeg.FS('writeFile', 'in.wav', new Uint8Array(buffer))
             await ffmpeg.run(
               '-i', // Input
@@ -410,7 +402,6 @@ export const useWhisper: UseWhisperHook = (config) => {
               'out.mp3' // Output
             )
             const out = ffmpeg.FS('readFile', 'out.mp3')
-            console.log({ out: out.buffer.byteLength })
             // 225 seems to be empty mp3 file
             if (out.length <= 225) {
               ffmpeg.exit()
@@ -424,14 +415,11 @@ export const useWhisper: UseWhisperHook = (config) => {
             ffmpeg.exit()
           } else {
             const buffer = await blob.arrayBuffer()
-            console.log({ wav: buffer.byteLength })
             const mp3 = encoder.current.encodeBuffer(new Int16Array(buffer))
             blob = new Blob([mp3], { type: 'audio/mpeg' })
-            console.log({ blob, mp3: mp3.byteLength })
           }
           if (typeof onTranscribeCallback === 'function') {
             const transcribed = await onTranscribeCallback(blob)
-            console.log('onTranscribe', transcribed)
             setTranscript(transcribed)
             setTranscribing(false)
             return transcribed.text ?? null
@@ -442,7 +430,6 @@ export const useWhisper: UseWhisperHook = (config) => {
 
       return transcribed_message
     } catch (err) {
-      console.info(err)
       setTranscribing(false)
       return null
     }
@@ -455,7 +442,6 @@ export const useWhisper: UseWhisperHook = (config) => {
    * - set transcript text with interim result
    */
   const onDataAvailable = async (data: Blob) => {
-    console.log('onDataAvailable', data)
     try {
       if (streaming && recorder.current) {
         onDataAvailableCallback?.(data)
@@ -474,14 +460,12 @@ export const useWhisper: UseWhisperHook = (config) => {
             type: 'audio/mpeg',
           })
           const text = await onWhispered(file) // change this part to use a locally hosted whisper model (sst_server) for real-time transcription
-          console.log('onInterim', { text })
           if (text) {
             setTranscript((prev) => ({ ...prev, text }))
           }
         }
       }
     } catch (err) {
-      console.error(err)
     }
   }
 
