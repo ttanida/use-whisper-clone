@@ -227,7 +227,7 @@ export const useWhisper: UseWhisperHook = (config) => {
         listener.current = hark(stream.current, {
           interval: 50,
           play: false,
-          threshold: -60,
+          threshold: whisperConfig?.threshold ?? -60, // Use whisperConfig.threshold if available, otherwise use -60
         })
         listener.current.on('speaking', onStartSpeaking)
         listener.current.on('stopped_speaking', onStopSpeaking)
