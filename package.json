@@ -1,6 +1,6 @@
 {
   "name": "@ttanida/use-whisper",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "React Hook for OpenAI Whisper API with speech recorder and silence removal built-in.",
   "keywords": [
     "react",
@@ -42,6 +42,12 @@
     "lamejs": "github:zhuker/lamejs",
     "micromatch": "^4.0.8",
     "recordrtc": "^5.6.2",
+    "semver": "^7.5.2",
+    "word-wrap": "^1.2.4"
+  },
+  "resolutions": {
+    "braces": "^3.0.3",
+    "micromatch": "^4.0.8",
     "semver": "^7.5.2",
     "word-wrap": "^1.2.4"
   },
